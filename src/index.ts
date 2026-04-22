@@ -23,6 +23,8 @@ app.get ("/customers", async (req: Request, res:Response)=> {
 return res.status(200).json(customers);
 });
 
+// The server and APi are completed
+
 
 
 

@@ -4,10 +4,106 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id          String  @id @default(uuid())
+  email       String  @unique
+  username    String  @unique
+  password    String
+  firstName   String
+  lastName    String
+  phone       String  @unique
+  dob         DateTime?
+  gender      Gender
+  image       String?
+  role        Role @default(ATTENDANT)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  shops       Shop[]
+  attendingShops Shop[] @relation("ShopAttendants")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Role {
+  ADMIN
+  ATTENDANT
+}
+
+model Customer {
+  id               String        @id @default(uuid())
+  customerType     CustomerType
+  firstName        String
+  lastName         String
+  phone            String        @unique
+  gender           Gender
+  maxCreditLimit   Float
+  maxCreditDays    Int
+  taxPin           String?
+  dob              DateTime?
+  email            String?       @unique
+  nationalID       String?       @unique
+  country          String
+  location         String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+  DISTRIBUTOR
+  OTHER
+}
+
+model Shop {
+  id        String  @id @default(uuid())
+  name      String
+  location  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  adminId   String
+  admin     User @relation(fields: [adminId], references: [id])
+  attendants User[] @relation("ShopAttendants")
+}
+
+model Supplier {
+  id                   String       @id @default(uuid())
+  supplierType         SupplierType
+  name                 String
+  contactPerson        String
+  phone                String        @unique
+  email                String?       @unique
+  location             String
+  country              String
+  website              String?
+  taxPin               String?
+  registrationNumber   String?       @unique
+  bankAccountNumber    String?
+  bankName             String?
+  paymentTerms         String?
+  logo                 String?       @default("https://example.com/default-logo.png")
+  rating               Float?
+  notes                String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+}
+
+enum SupplierType {
+  MANUFACTURER
+  DISTRIBUTOR
+  WHOLESALER
+  RETAILER
+  OTHER
 }
